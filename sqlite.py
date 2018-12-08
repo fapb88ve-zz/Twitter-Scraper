@@ -11,26 +11,24 @@ class SQLite():
             print(e)
 
     def table_creator(self):
-
         sql1 = """
-        CREATE TABLE IF NOT EXIST user_info (
-        id integer PRIMARY KEY,
-        user_name text NOT NULL,
-        num_tweets integer NOT NULL,
-        num_status integer NOT NULL
+        CREATE TABLE IF NOT EXISTS user_info (
+        user_name TEXT NOT NULL,
+        num_follower INTEGER NOT NULL,
+        num_status INTEGER NOT NULL
         );
         """
-
         sql2 = """
-        CREATE TABLE IF NOT EXIST tweets_status (
-        id integer PRIMARY KEY,
-        user_name text NOT NULL,
-        created_at date NOT NULL,
-        status_id integer NOT NULL,
-        favorite_count integer NOT NULL,
-        retweet_count integer NOT NULL,
-        message_count integer NOT NULL,
-        status_text text NOT NULL
+        CREATE TABLE IF NOT EXISTS tweets_status (
+        user_name TEXT NOT NULL,
+        created_at DATE NOT NULL,
+        status_id INTEGER NOT NULL,
+        favorite_count INTEGER NOT NULL,
+        retweet_count INTEGER NOT NULL,
+        message_count INTEGER NOT NULL,
+        status_text TEXT NOT NULL,
+        FOREIGN KEY (user_name) REFERENCES user_info (user_name)
+
         );
         """
         try:
@@ -39,3 +37,32 @@ class SQLite():
                 c.execute(command)
         except Error as e:
             print(e)
+
+    def table_updater(self, table_name, data):
+        if table_name == "user_info":
+            sql = """
+            INSERT INTO user_info (user_name, num_follower, num_status)
+            VALUES ({}, {}, {})
+
+            """.format(data[0], data[1], data[2])
+        else:
+            sql = """
+            INSERT INTO user_info (user_name, created_at, status_id,
+                                    favorite_count, retweet_count, message_count,
+                                    status_text)
+            VALUES ({}, {}, {}, {}, {}, {}, {})
+
+            """.format(data[0], data[1], data[2], data[3],data[4],data[5],data[6])
+
+        try:
+            c = self.connection
+            c.execute(sql)
+        except Error as e:
+            print(e)
+
+if __name__ == "__main__":
+    a = SQLite("test.db")
+
+    print(a.table_creator())
+
+    a.table_updater("user_info", ["a",3,2])
