@@ -41,28 +41,28 @@ class SQLite():
     def table_updater(self, table_name, data):
         if table_name == "user_info":
             sql = """
-            INSERT INTO user_info (user_name, num_follower, num_status)
-            VALUES ({}, {}, {})
-
-            """.format(data[0], data[1], data[2])
+            INSERT INTO user_info
+            VALUES (?,?,?)
+            """
         else:
             sql = """
             INSERT INTO user_info (user_name, created_at, status_id,
                                     favorite_count, retweet_count, message_count,
                                     status_text)
-            VALUES ({}, {}, {}, {}, {}, {}, {})
+            VALUES (?,?,?,?,?,?,?)
 
-            """.format(data[0], data[1], data[2], data[3],data[4],data[5],data[6])
+            """
 
         try:
             c = self.connection
-            c.execute(sql)
+            c.execute(sql, data)
+            c.commit()
         except Error as e:
             print(e)
 
 if __name__ == "__main__":
     a = SQLite("test.db")
 
-    print(a.table_creator())
+    #print(a.table_creator())
 
-    a.table_updater("user_info", ["a",3,2])
+    a.table_updater("user_info", ['PoleoRafael', 698859, 47362])
